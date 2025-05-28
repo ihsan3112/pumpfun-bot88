@@ -2,32 +2,28 @@ import requests
 import json
 import time
 
-# === KONFIGURASI ===
-PUMPFUN_API = "https://api.pump.fun/markets/recent"
+print("🚀 Bot mulai...")
 
-# === LOAD WALLET ===
+# === Load wallet ===
 with open("my-autobuy-wallet.json", "r") as f:
-    wallet_data = json.load(f)
+    wallet = json.load(f)
     print("✅ Dompet berhasil dimuat.")
 
-# === AMBIL TOKEN BARU ===
+# === Ambil token baru ===
 def get_recent_tokens():
     try:
-        res = requests.get(PUMPFUN_API)
+        res = requests.get("https://api.pump.fun/markets/recent")
         print(f"Status Code: {res.status_code}")
-        data = res.json()
-        return data.get("markets", [])
+        return res.json().get("markets", [])
     except Exception as e:
-        print(f"ERROR get_recent_tokens(): {e}")
+        print(f"❌ ERROR saat fetch token: {e}")
         return []
 
-# === LOOPING BOT ===
-print("🚀 Bot aktif dan memulai loop...\n")
-
+# === Loop utama ===
 while True:
     tokens = get_recent_tokens()
     if tokens:
-        print(f"🟢 Token Terdeteksi: {tokens[0]}")
+        print(f"🟢 Terdeteksi token: {tokens[0]}")
     else:
-        print("🔄 Belum ada token baru...")
+        print("🔄 Tidak ada token baru.")
     time.sleep(5)
