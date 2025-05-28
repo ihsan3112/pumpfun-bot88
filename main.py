@@ -12,9 +12,6 @@ while True:
     print(f"Token terbaru: {token}")
     print(f"🛒 Membeli token {token} sejumlah {BUY_AMOUNT_SOL} SOL...")
     
-    # Simulasi pembelian
     time.sleep(2)
     print(f"✅ Pembelian {token} berhasil.\n")
-
-    # Jeda sebelum cek token berikutnya
     time.sleep(3)
