@@ -1,7 +1,6 @@
 import requests
 import time
 
-# Konfigurasi
 BUY_AMOUNT_SOL = 0.01
 TAKE_PROFIT_MULTIPLIER = 2.0
 TRAILING_STOP_DROP = 0.3
