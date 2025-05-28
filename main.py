@@ -13,6 +13,9 @@ except Exception as e:
     print(f"❌ Gagal memuat dompet: {e}")
 
 # === Ambil token Pump.fun ===
+import random
+import string
+import time
 def get_recent_tokens():
     try:
         url = "https://api.pump.fun/api/markets/recent"
