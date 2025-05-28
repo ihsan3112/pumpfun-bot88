@@ -15,7 +15,7 @@ except Exception as e:
 # === Ambil token Pump.fun ===
 def get_recent_tokens():
     try:
-        url = "https://api.pump.fun/markets/recent"
+        url = "https://api.pump.fun/api/markets/recent"
         response = requests.get(url)
         print(f"🌐 Status: {response.status_code}")
         data = response.json()
