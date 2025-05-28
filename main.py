@@ -1,7 +1,6 @@
 import time
 import random
 
-# === KONFIGURASI DUMMY ===
 BUY_AMOUNT_SOL = 0.01
 TOKENS_DUMMY = ["TokenA", "TokenB", "TokenC", "TokenD", "TokenE"]
 
