@@ -1,34 +1,33 @@
 import requests
 import json
+import time
 
 # === KONFIGURASI ===
-BUY_AMOUNT_SOL = 0.05
-TAKE_PROFIT_MULTIPLIER = 2.0
-TRAILING_STOP_DROP = 0.3
 PUMPFUN_API = "https://api.pump.fun/markets/recent"
-JUPITER_PRICE_API = "https://price.jup.ag/v4/price?ids="
 
 # === LOAD WALLET ===
 with open("my-autobuy-wallet.json", "r") as f:
     wallet_data = json.load(f)
-    print("Dompet berhasil dimuat.")
-
-sudah_beli = {}
+    print("✅ Dompet berhasil dimuat.")
 
 # === AMBIL TOKEN BARU ===
 def get_recent_tokens():
     try:
-        res = requests.get(PUMPFUN_API).json()
-        return res["markets"]
-    except:
+        res = requests.get(PUMPFUN_API)
+        print(f"Status Code: {res.status_code}")
+        data = res.json()
+        return data.get("markets", [])
+    except Exception as e:
+        print(f"ERROR get_recent_tokens(): {e}")
         return []
 
-# === AMBIL HARGA TOKEN ===
-def get_token_price(token_mint):
-    try:
-        res = requests.get(f"{JUPITER_PRICE_API}{token_mint}")
-        return res.json()
-    except:
-        return {}
+# === LOOPING BOT ===
+print("🚀 Bot aktif dan memulai loop...\n")
 
-print("Bot aktif. Token terbaru:", get_recent_tokens()[:1])
+while True:
+    tokens = get_recent_tokens()
+    if tokens:
+        print(f"🟢 Token Terdeteksi: {tokens[0]}")
+    else:
+        print("🔄 Belum ada token baru...")
+    time.sleep(5)
