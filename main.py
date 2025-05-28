@@ -1,38 +1,63 @@
-import time
-import random
 import requests
-import json
+import time
 
-# ======== KONFIGURASI =========
+# Konfigurasi
 BUY_AMOUNT_SOL = 0.01
-TOKENS_DUMMY = ["TokenA", "TokenB", "TokenC", "TokenD", "TokenE"]
+TAKE_PROFIT_MULTIPLIER = 2.0
+TRAILING_STOP_DROP = 0.3
 
-# Telegram config
-TELEGRAM_ENABLED = True
-BOT_TOKEN = "8161302162:AAFyas7aBR1r3X-HaznMwWhuhfV2jZfqDHCA"
-CHAT_ID = "78066164019"
+PUMPFUN_API = "https://api.pump.fun/markets/recent"
+JUPITER_PRICE_API = "https://price.jup.ag/v4/price"
 
-def send_telegram(message):
-    if TELEGRAM_ENABLED:
-        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-        data = {
-            "chat_id": CHAT_ID,
-            "text": message
-        }
-        try:
-            requests.post(url, data=data)
-        except Exception as e:
-            print(f"Gagal kirim pesan Telegram: {e}")
+sudah_beli = []
 
-print("🤖 Bot dummy aktif...")
+def get_recent_tokens():
+    try:
+        res = requests.get(PUMPFUN_API)
+        return res.json().get("markets", [])
+    except:
+        return []
+
+def get_token_price(token_mint):
+    try:
+        res = requests.get(f"{JUPITER_PRICE_API}?ids={token_mint}")
+        data = res.json()
+        return data.get(token_mint, {}).get("price", 0)
+    except:
+        return 0
 
 while True:
-    token = random.choice(TOKENS_DUMMY)
-    print(f"🆕 Token terbaru: {token}")
-    print(f"💰 Membeli token {token} sejumlah {BUY_AMOUNT_SOL} SOL...")
-    send_telegram(f"🆕 Token baru terdeteksi: {token}\n💰 Membeli {BUY_AMOUNT_SOL} SOL")
+    print("🔄 Mengecek token baru...")
+    tokens = get_recent_tokens()
+    for token in tokens:
+        mint = token["mint"]
+        if mint in sudah_beli:
+            continue
 
-    time.sleep(2)
-    print(f"✅ Pembelian {token} berhasil.\n")
-    send_telegram(f"✅ Pembelian token {token} berhasil.")
-    time.sleep(5)
+        price = get_token_price(mint)
+        if price == 0:
+            continue
+
+        print(f"✅ Token baru terdeteksi: {mint}")
+        print(f"💰 Membeli token {mint} senilai {BUY_AMOUNT_SOL} SOL...")
+        sudah_beli.append(mint)
+
+        buy_price = price
+        peak_price = price
+
+        while True:
+            time.sleep(5)
+            current_price = get_token_price(mint)
+            if current_price > peak_price:
+                peak_price = current_price
+
+            profit_target = buy_price * TAKE_PROFIT_MULTIPLIER
+            stop_price = peak_price * (1 - TRAILING_STOP_DROP)
+
+            if current_price >= profit_target:
+                print(f"🎯 TAKE PROFIT {mint}: {current_price:.4f} SOL (beli: {buy_price:.4f})")
+                break
+            elif current_price <= stop_price:
+                print(f"🛑 STOP LOSS {mint}: {current_price:.4f} SOL (peak: {peak_price:.4f})")
+                break
+    time.sleep(10)
