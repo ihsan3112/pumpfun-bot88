@@ -9,57 +9,47 @@ from solders.pubkey import Pubkey
 from solders.signature import Signature
 import base64
 
-# === Konfigurasi ===
+# --- Konfigurasi ---
 PUMPFUN_API = "https://api.pump.fun/markets/recent"
 JUPITER_SWAP_API = "https://quote-api.jup.ag/v6/swap"
 RPC_URL = "https://api.mainnet-beta.solana.com"
 BUY_AMOUNT_SOL = 0.01
-TAKE_PROFIT_MULTIPLIER = 2.0
-TRAILING_STOP_DROP = 0.3
 
-print("🔄 Memulai bot...")
-
-# === Load Wallet ===
-try:
-    with open("my-autobuy-wallet.json") as f:
-        secret = json.load(f)
-        keypair = Keypair.from_secret_key(bytes(secret))
-        print("✅ Dompet berhasil dimuat.")
-except Exception as e:
-    print("❌ Gagal memuat wallet:", e)
-    exit()
+# --- Load Wallet ---
+with open("my-autobuy-wallet.json") as f:
+    secret = json.load(f)
+    keypair = Keypair.from_secret_key(bytes(secret))
 
 client = Client(RPC_URL)
 ALREADY_BOUGHT = []
 
-# === Ambil Token Baru ===
+# --- Ambil token baru ---
 def get_recent_tokens():
     try:
         res = requests.get(PUMPFUN_API)
-        tokens = res.json().get("remarkets", [])
+        print("DEBUG response:", res.status_code)
+        print("DEBUG JSON:", res.text)
+        tokens = res.json().get("markets", [])
         return [t for t in tokens if t["mint"] not in ALREADY_BOUGHT]
     except Exception as e:
-        print("⚠️  Gagal ambil token:", e)
+        print("❌ Gagal ambil token:", e)
         return []
 
-# === Simulasi Beli Token ===
-def simulate_buy(token):
-    print(f"\n🪙 Token terbaru: {token['symbol']} ({token['mint']})")
-    print(f"💸 Membeli token {token['symbol']} sebesar {BUY_AMOUNT_SOL} SOL...")
-    time.sleep(1)
-    print(f"✅ Pembelian {token['symbol']} berhasil.\n")
+# --- Proses beli ---
+def beli_token(token):
+    print(f"🛒 Membeli token {token['name']} sebesar {BUY_AMOUNT_SOL} SOL... (simulasi)")
+    # di versi real nanti kita kirim transaksi di sini
+    time.sleep(2)
+    print(f"✅ Pembelian {token['name']} berhasil.\n")
 
-# === Main Loop ===
-print("🚀 Bot aktif dan memantau token baru...")
-
+# --- Loop utama ---
+print("🚀 Bot aktif...")
 while True:
     tokens = get_recent_tokens()
     if tokens:
         for token in tokens:
+            beli_token(token)
             ALREADY_BOUGHT.append(token["mint"])
-            simulate_buy(token)
-            # logika take profit / trailing stop bisa ditambahkan nanti
-            time.sleep(2)
     else:
-        print("⏳ Belum ada token baru. Menunggu 10 detik...")
+        print("⏳ Belum ada token baru. Menunggu 10 detik...\n")
     time.sleep(10)
