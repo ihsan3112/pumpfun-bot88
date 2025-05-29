@@ -56,7 +56,7 @@ def dummy_autobuy():
             time.sleep(1)
             print(f"✅ Dummy beli token {mint} selesai!\n")
             ALREADY_BOUGHT.append(mint)
-            break  # hanya beli 1 token per siklus
+            break
     else:
         print("📭 Tidak ada token baru.")
 
