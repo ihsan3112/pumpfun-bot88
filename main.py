@@ -10,7 +10,7 @@ from solders.signature import Signature
 import base64
 
 # --- Konfigurasi ---
-PUMPFUN_API = "https://api.pump.fun/markets/recent"
+PUMPFUN_API = "https://client-api-2-0.prod.pump.fun/tokens/recent"  # ✅ URL valid
 JUPITER_SWAP_API = "https://quote-api.jup.ag/v6/swap"
 RPC_URL = "https://api.mainnet-beta.solana.com"
 BUY_AMOUNT_SOL = 0.01
@@ -28,8 +28,8 @@ def get_recent_tokens():
     try:
         res = requests.get(PUMPFUN_API)
         print("DEBUG response:", res.status_code)
-        print("DEBUG JSON:", res.text)
-        tokens = res.json().get("markets", [])
+        print("DEBUG JSON:", res.text[:200])  # tampilkan 200 karakter awal
+        tokens = res.json().get("recentTokens", [])
         return [t for t in tokens if t["mint"] not in ALREADY_BOUGHT]
     except Exception as e:
         print("❌ Gagal ambil token:", e)
@@ -37,10 +37,9 @@ def get_recent_tokens():
 
 # --- Proses beli ---
 def beli_token(token):
-    print(f"🛒 Membeli token {token['name']} sebesar {BUY_AMOUNT_SOL} SOL... (simulasi)")
-    # di versi real nanti kita kirim transaksi di sini
+    print(f"🛒 Membeli token {token['tokenSymbol']} sebesar {BUY_AMOUNT_SOL} SOL... (simulasi)")
     time.sleep(2)
-    print(f"✅ Pembelian {token['name']} berhasil.\n")
+    print(f"✅ Pembelian {token['tokenSymbol']} berhasil.\n")
 
 # --- Loop utama ---
 print("🚀 Bot aktif...")
