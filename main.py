@@ -58,7 +58,7 @@ def buy_token(token_address):
     except Exception as e:
         print(f"[GAGAL BELI] {e}\n")
 
-# === Fungsi Dummy Harga Token (simulasi, perlu diganti API harga real) ===
+# === Fungsi Dummy Harga Token ===
 def get_token_price(token_address):
     return 1.0 + (time.time() % 10) / 100
 
